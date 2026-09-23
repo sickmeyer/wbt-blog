@@ -2,10 +2,11 @@
 // iMessage, etc. Rendered at build time with Satori, using the fonts in
 // src/og-assets/, so the output is identical on every machine.
 //
-// Layout rule: Facebook's mobile composer and some feeds crop link images
-// to roughly 1.2:1 -- only the middle ~720px of the width survives. So all
-// text sits in a centered column narrower than that; only background and
-// decoration run to the edges.
+// Layout rule: Facebook crops link images in some places -- to ~1.2:1 in
+// the mobile composer, and all the way to a square in parts of the feed --
+// keeping only the center. So all text sits inside the center 630x630
+// square (a ~540px column); only background and decoration run to the
+// edges. Wide previews (X, iMessage, LinkedIn) still show the full 1200x630.
 import { readFileSync } from 'node:fs';
 import satori from 'satori';
 import sharp from 'sharp';
@@ -22,7 +23,7 @@ const MARK = `data:image/png;base64,${asset('mark.png').toString('base64')}`;
 const NAVY = '#064060';
 const CREAM = '#f8dfaf';
 const RED = '#8a1515';
-const SAFE_WIDTH = 700;
+const SAFE_WIDTH = 540;
 
 type Node = { type: string; props: Record<string, unknown> };
 const h = (type: string, style: Record<string, unknown>, children?: unknown, extra: Record<string, unknown> = {}): Node => ({
@@ -40,10 +41,10 @@ export interface OgContent {
 }
 
 function titleSize(title: string): number {
-	if (title.length <= 40) return 58;
-	if (title.length <= 70) return 50;
-	if (title.length <= 100) return 44;
-	return 38;
+	if (title.length <= 28) return 54;
+	if (title.length <= 55) return 46;
+	if (title.length <= 85) return 40;
+	return 35;
 }
 
 export async function renderOg({ title, meta, passage }: OgContent): Promise<Buffer> {
@@ -63,8 +64,8 @@ export async function renderOg({ title, meta, passage }: OgContent): Promise<Buf
 		},
 		[
 			// Faint mark, large, off to both sides (decoration; fine if cropped)
-			h('img', { position: 'absolute', left: -120, top: 95, width: 440, height: 440, opacity: 0.06 }, undefined, { src: MARK }),
-			h('img', { position: 'absolute', right: -120, top: 95, width: 440, height: 440, opacity: 0.06 }, undefined, { src: MARK }),
+			h('img', { position: 'absolute', left: -150, top: 95, width: 440, height: 440, opacity: 0.06 }, undefined, { src: MARK }),
+			h('img', { position: 'absolute', right: -150, top: 95, width: 440, height: 440, opacity: 0.06 }, undefined, { src: MARK }),
 			// Thin cream frame
 			h('div', {
 				position: 'absolute', left: 22, top: 22, width: 1156, height: 576,
@@ -79,23 +80,23 @@ export async function renderOg({ title, meta, passage }: OgContent): Promise<Buf
 				[
 					h('img', { width: 70, height: 68 }, undefined, { src: MARK }),
 					h('div', {
-						marginTop: 12, fontFamily: 'Source Sans 3', fontWeight: 600, fontSize: 19,
-						letterSpacing: 5, color: CREAM, textTransform: 'uppercase',
+						marginTop: 12, fontFamily: 'Source Sans 3', fontWeight: 600, fontSize: 17,
+						letterSpacing: 4, color: CREAM, textTransform: 'uppercase',
 					}, CHURCH.name),
-					h('div', { marginTop: 20, width: 56, height: 2, backgroundColor: 'rgba(248, 223, 175, 0.55)' }),
+					h('div', { marginTop: 18, width: 56, height: 2, backgroundColor: 'rgba(248, 223, 175, 0.55)' }),
 					h('div', {
-						marginTop: 26, fontFamily: 'Libre Baskerville', fontWeight: 700, fontSize: size,
-						lineHeight: 1.22, color: '#ffffff', lineClamp: 4, display: 'block',
+						marginTop: 22, fontFamily: 'Libre Baskerville', fontWeight: 700, fontSize: size,
+						lineHeight: 1.2, color: '#ffffff', lineClamp: 5, display: 'block',
 					}, title),
 					...(meta
 						? [h('div', {
-							marginTop: 28, fontFamily: 'Source Sans 3', fontWeight: 600, fontSize: 25,
-							color: CREAM, letterSpacing: 0.5,
+							marginTop: 24, fontFamily: 'Source Sans 3', fontWeight: 600, fontSize: 21,
+							color: CREAM, letterSpacing: 0.3,
 						}, meta)]
 						: []),
 					...(passage
 						? [h('div', {
-							marginTop: 8, fontFamily: 'Libre Baskerville', fontStyle: 'italic', fontSize: 23,
+							marginTop: 6, fontFamily: 'Libre Baskerville', fontStyle: 'italic', fontSize: 20,
 							color: '#dfe7ee',
 						}, passage)]
 						: []),
