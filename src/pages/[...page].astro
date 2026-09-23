@@ -1,106 +1,15 @@
 ---
-import type { GetStaticPaths, Page } from 'astro';
-import PostCard from '../components/PostCard.astro';
-import { CHURCH, PAGE_SIZE, SITE_DESCRIPTION } from '../consts';
-import Base from '../layouts/Base.astro';
-import { getPosts, type Post } from '../lib/posts';
+import type { GetStaticPaths } from 'astro';
+import { PAGE_SIZE } from '../consts';
+import { getPosts } from '../lib/posts';
+import HomeView from '../views/HomeView.astro';
 
-// Home page and its paginated continuation: /, /2/, /3/ ...
+// Home page and its paginated continuation.
 export const getStaticPaths = (async ({ paginate }) => {
-	return paginate(await getPosts(), { pageSize: PAGE_SIZE });
+	return paginate(await getPosts('en'), { pageSize: PAGE_SIZE });
 }) satisfies GetStaticPaths;
 
-interface Props {
-	page: Page<Post>;
-}
 const { page } = Astro.props;
-const first = page.currentPage === 1;
 ---
 
-<Base
-	title={first ? undefined : `Articles, page ${page.currentPage}`}
-	description={SITE_DESCRIPTION}
->
-	{
-		first && (
-			<section class="intro">
-				<p class="eyebrow">{CHURCH.name}</p>
-				<h1>Sermon Articles</h1>
-				<p>
-					The preaching from our services, written down to be read, shared and studied. Every
-					scripture quotation is checked against the King James Version.
-				</p>
-			</section>
-		)
-	}
-	{!first && (
-		<header class="page-head">
-			<h1>Articles</h1>
-			<p>Page {page.currentPage} of {page.lastPage}</p>
-		</header>
-	)}
-
-	{
-		page.data.length === 0 ? (
-			<p class="empty">
-				No articles have been published yet. Please check back after Sunday, or visit{' '}
-				<a href={CHURCH.url}>wbt4god.com</a> for service times and recordings.
-			</p>
-		) : (
-			<div class="list">
-				{page.data.map((post) => (
-					<PostCard post={post} />
-				))}
-			</div>
-		)
-	}
-
-	{
-		page.lastPage > 1 && (
-			<nav class="pager" aria-label="Pagination">
-				{page.url.prev ? <a href={page.url.prev}>← Newer articles</a> : <span />}
-				<span class="count">Page {page.currentPage} of {page.lastPage}</span>
-				{page.url.next ? <a href={page.url.next}>Older articles →</a> : <span />}
-			</nav>
-		)
-	}
-</Base>
-
-<style>
-	.intro {
-		margin-bottom: 2.5rem;
-		padding-bottom: 2rem;
-		border-bottom: 1px solid var(--border);
-	}
-
-	.intro h1 {
-		font-size: clamp(2.2rem, 6vw, 3.2rem);
-		margin: 0 0 0.6rem;
-	}
-
-	.intro p:last-child {
-		margin: 0;
-		font-size: 1.15rem;
-		color: var(--text-dim);
-		max-width: var(--measure);
-	}
-
-	.empty {
-		color: var(--text-dim);
-	}
-
-	.pager {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		gap: 1rem;
-		margin-top: 2rem;
-		font-weight: 700;
-	}
-
-	.pager .count {
-		font-weight: 400;
-		color: var(--text-muted);
-		font-size: 0.9rem;
-	}
-</style>
+<HomeView page={page} lang="en" />

@@ -4,7 +4,7 @@ import { formatDate, getPosts, type Post } from '../../lib/posts';
 import { renderOg } from '../../lib/og';
 
 export const getStaticPaths = (async () => {
-	const posts = await getPosts();
+	const posts = [...(await getPosts('en')), ...(await getPosts('es'))];
 	return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
 }) satisfies GetStaticPaths;
 
@@ -13,7 +13,7 @@ export const GET: APIRoute = async ({ props }) => {
 	const d = post.data;
 	const png = await renderOg({
 		title: d.title,
-		meta: [d.service, formatDate(d.pubDate)].filter(Boolean).join('  ·  '),
+		meta: [d.service, formatDate(d.pubDate, 'long', d.lang)].filter(Boolean).join('  ·  '),
 		passage: d.primaryPassage,
 	});
 	return new Response(new Uint8Array(png), { headers: { 'Content-Type': 'image/png' } });

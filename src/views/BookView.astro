@@ -1,0 +1,66 @@
+---
+import PostCard from '../components/PostCard.astro';
+import Base from '../layouts/Base.astro';
+import { type Lang, ROUTES, t } from '../lib/i18n';
+import { bookName, booksOf, type Post } from '../lib/posts';
+
+interface Props {
+	book: string;
+	posts: Post[];
+	lang: Lang;
+}
+const { book, posts, lang } = Astro.props;
+const tr = t(lang);
+const name = bookName(book, lang);
+// Articles preaching *from* this book first, then ones that only cite it.
+const primary = posts.filter((p) => p.data.primaryPassage && booksOf(p)[0] === book);
+const citing = posts.filter((p) => !primary.includes(p));
+---
+
+<Base lang={lang} title={`${tr.articles}: ${name}`} description={tr.bookCount(posts.length, name)}>
+	<header class="page-head">
+		<p class="eyebrow"><a href={ROUTES[lang].scripture}>{tr.scripture}</a></p>
+		<h1>{name}</h1>
+		<p>{tr.bookCount(posts.length, name)}</p>
+	</header>
+
+	{
+		primary.length > 0 && (
+			<section>
+				<h2>{tr.preachedFrom(name)}</h2>
+				{primary.map((post) => (
+					<PostCard post={post} level="h3" />
+				))}
+			</section>
+		)
+	}
+	{
+		citing.length > 0 && (
+			<section>
+				<h2>{tr.alsoCiting(name)}</h2>
+				{citing.map((post) => (
+					<PostCard post={post} level="h3" />
+				))}
+			</section>
+		)
+	}
+</Base>
+
+<style>
+	.eyebrow a {
+		color: inherit;
+	}
+
+	section {
+		margin-bottom: 2.5rem;
+	}
+
+	h2 {
+		font-size: 1.1rem;
+		font-family: var(--font-ui);
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--text-muted);
+		margin: 0 0 1rem;
+	}
+</style>

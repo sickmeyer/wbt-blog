@@ -1,14 +1,21 @@
 ---
 import { CHURCH } from '../consts';
+import { type Lang, ROUTES, t } from '../lib/i18n';
 
+interface Props {
+	lang?: Lang;
+}
+const { lang = 'en' } = Astro.props;
+const tr = t(lang);
+const r = ROUTES[lang];
 const year = new Date().getFullYear();
 ---
 
 <footer class="site-footer">
 	<div class="inner">
 		<div class="verse">
-			<p>“{CHURCH.tagline}”</p>
-			<p class="ref">{CHURCH.taglineRef}</p>
+			<p>“{lang === 'en' ? CHURCH.tagline : tr.footerVerse}”</p>
+			<p class="ref">{lang === 'en' ? CHURCH.taglineRef : tr.footerVerseRef}</p>
 		</div>
 		<div class="cols">
 			<div>
@@ -17,21 +24,21 @@ const year = new Date().getFullYear();
 				<p><a href={CHURCH.url}>wbt4god.com</a></p>
 			</div>
 			<div>
-				<h2>Service times</h2>
+				<h2>{tr.serviceTimes}</h2>
 				<ul>
-					{CHURCH.services.map((s) => <li><strong>{s.day}:</strong> {s.times}</li>)}
+					{CHURCH.services.map((s) => <li><strong>{tr.days[s.day] ?? s.day}:</strong> {s.times}</li>)}
 				</ul>
 			</div>
 			<div>
-				<h2>Follow along</h2>
+				<h2>{tr.followAlong}</h2>
 				<ul>
-					<li><a href="/rss.xml">RSS feed</a></li>
-					<li><a href="/archive/">All articles</a></li>
-					<li><a href="/scripture/">Articles by book</a></li>
+					<li><a href={r.rss}>{tr.rssFeed}</a></li>
+					<li><a href={r.archive}>{tr.allArticles}</a></li>
+					<li><a href={r.scripture}>{tr.articlesByBook}</a></li>
 				</ul>
 			</div>
 		</div>
-		<p class="fine">© {year} {CHURCH.name}. Scripture quotations are from the King James Version.</p>
+		<p class="fine">© {year} {CHURCH.name}. {tr.scriptureNotice}</p>
 	</div>
 </footer>
 

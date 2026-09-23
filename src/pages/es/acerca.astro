@@ -1,0 +1,53 @@
+---
+import { CHURCH } from '../../consts';
+import Base from '../../layouts/Base.astro';
+import { ROUTES, t } from '../../lib/i18n';
+---
+
+<Base lang="es" title="Acerca de" description={`Acerca de los artículos de sermones del servicio en español de ${CHURCH.name}, en ${CHURCH.city}, Minnesota.`}>
+	<article class="about">
+		<header class="page-head">
+			<p class="eyebrow">Acerca de</p>
+			<h1>Acerca de Estos Artículos</h1>
+		</header>
+
+		<div class="prose">
+			<p>
+				{CHURCH.name} es una iglesia bautista independiente en {CHURCH.city}, Minnesota, que cree,
+				predica y practica la Biblia. Cada domingo por la tarde tenemos un servicio en español.
+			</p>
+			<p>
+				Los artículos de esta sección se adaptan de la predicación de ese servicio, para que quien
+				no pudo estar presente también pueda sentarse con el mensaje y ser alimentado por la Palabra.
+				Cada artículo se escribe a partir del sermón, se revisa antes de publicarse, y cada versículo
+				citado se verifica con la Reina Valera Gómez.
+			</p>
+			<p>
+				Cuando hay una grabación disponible, aparece al principio del artículo para que usted pueda
+				escuchar el mensaje tal como se predicó.
+			</p>
+
+			<h2>Visítenos</h2>
+			<ul>
+				{CHURCH.services.map((s) => <li><strong>{t('es').days[s.day] ?? s.day}:</strong> {s.times}</li>)}
+			</ul>
+			<p>
+				{CHURCH.city}, {CHURCH.region} {CHURCH.postalCode} · {CHURCH.phone}<br />
+				Encontrará más información sobre la iglesia en{' '}
+				<a href={CHURCH.url}>wbt4god.com</a>.
+			</p>
+
+			<h2>Reciba los nuevos artículos</h2>
+			<p>
+				Agregue <a href={ROUTES.es.rss}>nuestro canal RSS</a> a su lector de noticias para ver cada
+				artículo nuevo en cuanto se publique.
+			</p>
+		</div>
+	</article>
+</Base>
+
+<style>
+	.about {
+		max-width: var(--measure);
+	}
+</style>

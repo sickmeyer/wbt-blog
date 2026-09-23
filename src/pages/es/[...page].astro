@@ -1,0 +1,15 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { PAGE_SIZE } from '../../consts';
+import { getPosts } from '../../lib/posts';
+import HomeView from '../../views/HomeView.astro';
+
+// Home page and its paginated continuation.
+export const getStaticPaths = (async ({ paginate }) => {
+	return paginate(await getPosts('es'), { pageSize: PAGE_SIZE });
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+---
+
+<HomeView page={page} lang="es" />

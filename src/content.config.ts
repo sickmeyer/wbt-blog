@@ -19,6 +19,8 @@ const post = z.object({
 	audioUrl: z.url().optional(),
 	videoUrl: z.url().optional(),
 	sourceId: z.string().optional(),
+	// 'es' posts are shown under /es/ (Spanish service); English is the default.
+	lang: z.enum(['en', 'es']).default('en'),
 });
 
 // Published posts: committed to the repo and deployed.

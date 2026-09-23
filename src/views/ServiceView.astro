@@ -1,0 +1,23 @@
+---
+import PostCard from '../components/PostCard.astro';
+import Base from '../layouts/Base.astro';
+import { type Lang, t } from '../lib/i18n';
+import type { Post } from '../lib/posts';
+
+interface Props {
+	service: string;
+	posts: Post[];
+	lang: Lang;
+}
+const { service, posts, lang } = Astro.props;
+const tr = t(lang);
+---
+
+<Base lang={lang} title={service} description={`${tr.siteTitle}: ${service}. ${tr.rssDescription}`}>
+	<header class="page-head">
+		<p class="eyebrow">{tr.service}</p>
+		<h1>{service}</h1>
+		<p>{tr.countArticles(posts.length)}</p>
+	</header>
+	{posts.map((post) => <PostCard post={post} />)}
+</Base>

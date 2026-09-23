@@ -1,0 +1,9 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { servicePaths } from '../../../lib/paths';
+import ServiceView from '../../../views/ServiceView.astro';
+
+export const getStaticPaths = (() => servicePaths('es')) satisfies GetStaticPaths;
+---
+
+<ServiceView {...Astro.props} />

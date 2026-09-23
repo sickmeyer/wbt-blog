@@ -1,0 +1,9 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { bookPaths } from '../../../lib/paths';
+import BookView from '../../../views/BookView.astro';
+
+export const getStaticPaths = (() => bookPaths('es')) satisfies GetStaticPaths;
+---
+
+<BookView {...Astro.props} />

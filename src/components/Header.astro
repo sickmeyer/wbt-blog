@@ -1,22 +1,33 @@
 ---
 import { CHURCH } from '../consts';
+import { type Lang, ROUTES, t } from '../lib/i18n';
 
+interface Props {
+	lang?: Lang;
+}
+const { lang = 'en' } = Astro.props;
+const tr = t(lang);
+const r = ROUTES[lang];
+const other: Lang = lang === 'en' ? 'es' : 'en';
 const links = [
-	{ href: '/', label: 'Articles' },
-	{ href: '/scripture/', label: 'Scripture' },
-	{ href: '/archive/', label: 'Archive' },
-	{ href: '/search/', label: 'Search' },
-	{ href: '/about/', label: 'About' },
+	{ href: r.home, label: tr.articles },
+	{ href: r.scripture, label: tr.scripture },
+	{ href: r.archive, label: tr.archive },
+	{ href: r.search, label: tr.search },
+	{ href: r.about, label: tr.about },
 ];
 const path = Astro.url.pathname;
+const home = r.home;
 const isActive = (href: string) =>
-	href === '/' ? path === '/' || /^\/\d+\/$/.test(path) || path.startsWith('/posts/') : path.startsWith(href);
+	href === home
+		? path === home || /^\d+\/$/.test(path.slice(home.length)) || path.startsWith(`${home}posts/`)
+		: path.startsWith(href);
 ---
 
-<a class="skip-link" href="#content">Skip to content</a>
+<a class="skip-link" href="#content">{tr.skip}</a>
 <header class="site-header">
 	<div class="bar">
-		<a class="brand" href="/" aria-label={`${CHURCH.name} sermon articles, home`}>
+		<a class="brand" href={r.home} aria-label={`${CHURCH.name}: ${tr.siteTitle}`}>
 			<img src="/logo.png" alt={CHURCH.name} width="495" height="68" />
 		</a>
 		<nav aria-label="Main">
@@ -30,6 +41,7 @@ const isActive = (href: string) =>
 						</li>
 					))
 				}
+				<li><a class="lang-link" href={ROUTES[other].home} hreflang={other} lang={other} aria-label={tr.otherLangAria}>{tr.otherLangLabel}</a></li>
 				<li><a class="home-link" href={CHURCH.url}>wbt4god.com ↗</a></li>
 			</ul>
 		</nav>
@@ -91,6 +103,10 @@ const isActive = (href: string) =>
 
 	nav a[aria-current='page'] {
 		border-bottom-color: var(--cream);
+		color: var(--cream);
+	}
+
+	nav .lang-link {
 		color: var(--cream);
 	}
 

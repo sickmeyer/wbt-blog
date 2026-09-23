@@ -39,7 +39,7 @@ REGION = os.environ.get("AWS_REGION", "us-east-1")
 FEED_URL = os.environ.get("FEED_URL", "https://podcasts.subsplash.com/bg23rt3/podcast.rss")
 CHURCH_TZ = ZoneInfo(os.environ.get("CHURCH_TIMEZONE", "America/Chicago"))
 MIN_SERMON_WORDS = 400
-SERVICES = ["Sunday Main Worship", "Sunday Afternoon Worship", "Weekly Bible Hour", "Midweek Worship Service"]
+SERVICES = ["Sunday Main Worship", "Sunday Afternoon Worship", "Weekly Bible Hour", "Midweek Worship Service", "Servicio en Español"]
 ITUNES = {"itunes": "http://www.itunes.com/dtds/podcast-1.0.dtd"}
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -222,6 +222,7 @@ def main():
             "audioUrl": ep["audio"] if ep else None,
             "videoUrl": None if vid.startswith("subsplash-") else f"https://www.youtube.com/watch?v={vid}",
             "sourceId": vid,
+            "lang": "es" if article.get("language") == "es" or service == "Servicio en Español" else None,
         }
         front = {k: v for k, v in front.items() if v not in (None, "")}
         body = separate_blockquotes(article["article_markdown"].strip() + "\n")

@@ -1,4 +1,5 @@
 ---
+import { t } from '../lib/i18n';
 import { formatDate, type Post, postUrl, readingMinutes } from '../lib/posts';
 
 interface Props {
@@ -10,19 +11,20 @@ interface Props {
 const { post, level = 'h2' } = Astro.props;
 const { title, description, pubDate, service, primaryPassage, preacher } = post.data;
 const Heading = level;
+const lang = post.data.lang;
 ---
 
 <article class="card">
 	<p class="meta">
-		<time datetime={pubDate.toISOString().slice(0, 10)}>{formatDate(pubDate)}</time>
+		<time datetime={pubDate.toISOString().slice(0, 10)}>{formatDate(pubDate, 'long', lang)}</time>
 		{service && <span> · {service}</span>}
 		{preacher && <span> · {preacher}</span>}
-		<span> · {readingMinutes(post.body)} min read</span>
+		<span> · {t(lang).minRead(readingMinutes(post.body))}</span>
 	</p>
 	<Heading class="title"><a href={postUrl(post)}>{title}</a></Heading>
 	<p class="desc">{description}</p>
 	<p class="tags">
-		{post.isDraft && <span class="pill draft">Draft</span>}
+		{post.isDraft && <span class="pill draft">{lang === 'es' ? 'Borrador' : 'Draft'}</span>}
 		{primaryPassage && <span class="pill">{primaryPassage}</span>}
 	</p>
 </article>
