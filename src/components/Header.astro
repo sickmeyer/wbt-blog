@@ -1,0 +1,126 @@
+---
+import { CHURCH } from '../consts';
+
+const links = [
+	{ href: '/', label: 'Articles' },
+	{ href: '/scripture/', label: 'Scripture' },
+	{ href: '/archive/', label: 'Archive' },
+	{ href: '/search/', label: 'Search' },
+	{ href: '/about/', label: 'About' },
+];
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+	href === '/' ? path === '/' || /^\/\d+\/$/.test(path) || path.startsWith('/posts/') : path.startsWith(href);
+---
+
+<a class="skip-link" href="#content">Skip to content</a>
+<header class="site-header">
+	<div class="bar">
+		<a class="brand" href="/" aria-label={`${CHURCH.name} sermon articles, home`}>
+			<img src="/logo.png" alt={CHURCH.name} width="495" height="68" />
+		</a>
+		<nav aria-label="Main">
+			<ul>
+				{
+					links.map((l) => (
+						<li>
+							<a href={l.href} aria-current={isActive(l.href) ? 'page' : undefined}>
+								{l.label}
+							</a>
+						</li>
+					))
+				}
+				<li><a class="home-link" href={CHURCH.url}>wbt4god.com ↗</a></li>
+			</ul>
+		</nav>
+	</div>
+</header>
+
+<style>
+	.site-header {
+		background: var(--navy);
+		border-bottom: 4px solid var(--red);
+		color: #fff;
+	}
+
+	.bar {
+		max-width: 64rem;
+		margin: 0 auto;
+		padding: 0.9rem var(--gutter);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem 1.5rem;
+		flex-wrap: wrap;
+	}
+
+	.brand {
+		display: block;
+		line-height: 0;
+		flex: 0 1 auto;
+		max-width: 100%;
+	}
+
+	.brand img {
+		height: 46px;
+		width: auto;
+		max-width: 100%;
+	}
+
+	nav ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 1.1rem;
+	}
+
+	nav a {
+		color: #fff;
+		text-decoration: none;
+		font-weight: 700;
+		font-size: 0.95rem;
+		padding: 0.3rem 0;
+		border-bottom: 2px solid transparent;
+	}
+
+	nav a:hover {
+		border-bottom-color: var(--cream);
+	}
+
+	nav a[aria-current='page'] {
+		border-bottom-color: var(--cream);
+		color: var(--cream);
+	}
+
+	nav .home-link {
+		font-weight: 400;
+		opacity: 0.85;
+	}
+
+	@media (max-width: 760px) {
+		.bar {
+			padding-top: 0.75rem;
+			padding-bottom: 0.6rem;
+		}
+
+		.brand img {
+			height: auto;
+			width: 100%;
+			max-width: 320px;
+		}
+
+		nav {
+			width: 100%;
+		}
+
+		nav ul {
+			gap: 0.1rem 1rem;
+		}
+
+		nav a {
+			font-size: 0.92rem;
+		}
+	}
+</style>

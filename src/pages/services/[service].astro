@@ -1,0 +1,35 @@
+---
+import type { GetStaticPaths } from 'astro';
+import PostCard from '../../components/PostCard.astro';
+import Base from '../../layouts/Base.astro';
+import { getPosts, type Post, slugify } from '../../lib/posts';
+
+// One page per service (Sunday Main Worship, Weekly Bible Hour, ...).
+export const getStaticPaths = (async () => {
+	const posts = await getPosts();
+	const byService = new Map<string, Post[]>();
+	for (const post of posts) {
+		const s = post.data.service;
+		if (s) byService.set(s, [...(byService.get(s) ?? []), post]);
+	}
+	return [...byService].map(([service, list]) => ({
+		params: { service: slugify(service) },
+		props: { service, posts: list },
+	}));
+}) satisfies GetStaticPaths;
+
+interface Props {
+	service: string;
+	posts: Post[];
+}
+const { service, posts } = Astro.props;
+---
+
+<Base title={service} description={`Sermon articles from ${service} at Worthington Baptist Temple.`}>
+	<header class="page-head">
+		<p class="eyebrow">Service</p>
+		<h1>{service}</h1>
+		<p>{posts.length} article{posts.length === 1 ? '' : 's'}, newest first.</p>
+	</header>
+	{posts.map((post) => <PostCard post={post} />)}
+</Base>

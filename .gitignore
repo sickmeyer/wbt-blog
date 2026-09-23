@@ -1,0 +1,34 @@
+# build output
+dist/
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# environment variables
+.env
+.env.production
+
+# macOS-specific files
+.DS_Store
+
+# jetbrains setting folder
+.idea/
+
+# EchoPulpit drafts stay local until approved (the repo is public)
+src/content/drafts/*
+!src/content/drafts/.gitkeep
+
+# Python
+__pycache__/
+
+# Local-only notes and instructions
+*.local.md

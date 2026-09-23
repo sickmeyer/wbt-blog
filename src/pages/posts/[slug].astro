@@ -1,0 +1,406 @@
+---
+import { render } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import { CHURCH } from '../../consts';
+import Base from '../../layouts/Base.astro';
+import {
+	bookOf,
+	formatDate,
+	getPosts,
+	kjvLink,
+	type Post,
+	postUrl,
+	readingMinutes,
+	slugify,
+} from '../../lib/posts';
+
+export const getStaticPaths = (async () => {
+	const posts = await getPosts();
+	return posts.map((post, i) => ({
+		params: { slug: post.id },
+		// posts are newest-first: index-1 is newer, index+1 is older
+		props: { post, newer: posts[i - 1], older: posts[i + 1] },
+	}));
+}) satisfies GetStaticPaths;
+
+interface Props {
+	post: Post;
+	newer?: Post;
+	older?: Post;
+}
+const { post, newer, older } = Astro.props;
+const { Content } = await render(post);
+const d = post.data;
+
+const url = new URL(postUrl(post), Astro.site);
+const share = {
+	facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url.href)}`,
+	x: `https://x.com/intent/post?url=${encodeURIComponent(url.href)}&text=${encodeURIComponent(d.title)}`,
+	email: `mailto:?subject=${encodeURIComponent(d.title)}&body=${encodeURIComponent(`${d.description}\n\n${url.href}`)}`,
+};
+
+const references = [...new Set([d.primaryPassage, ...d.scripture].filter(Boolean) as string[])];
+
+const jsonLd = [
+	{
+		'@type': 'BlogPosting',
+		'@id': `${url.href}#article`,
+		mainEntityOfPage: url.href,
+		headline: d.title,
+		description: d.description,
+		datePublished: d.pubDate.toISOString(),
+		dateModified: (d.updatedDate ?? d.pubDate).toISOString(),
+		image: new URL(`/og/${post.id}.png`, Astro.site).href,
+		inLanguage: 'en-US',
+		keywords: d.keywords.join(', ') || undefined,
+		wordCount: (post.body ?? '').split(/\s+/).filter(Boolean).length,
+		author: d.preacher
+			? { '@type': 'Person', name: d.preacher, worksFor: { '@id': `${CHURCH.url}#church` } }
+			: { '@id': `${CHURCH.url}#church` },
+		publisher: { '@id': `${CHURCH.url}#church` },
+		about: d.primaryPassage ? { '@type': 'CreativeWork', name: d.primaryPassage } : undefined,
+	},
+	{
+		'@type': 'BreadcrumbList',
+		itemListElement: [
+			{ '@type': 'ListItem', position: 1, name: 'Articles', item: new URL('/', Astro.site).href },
+			{ '@type': 'ListItem', position: 2, name: d.title, item: url.href },
+		],
+	},
+];
+---
+
+<Base
+	title={d.title}
+	description={d.description}
+	type="article"
+	publishedTime={d.pubDate}
+	modifiedTime={d.updatedDate}
+	noindex={post.isDraft}
+	jsonLd={jsonLd}
+	image={`/og/${post.id}.png`}
+	imageAlt={`${d.title}: a sermon article from ${CHURCH.name}`}
+	keywords={[...new Set([...d.keywords, ...d.tags, d.primaryPassage].filter(Boolean) as string[])]}
+	section={d.service}
+	author={d.preacher}
+>
+	<article class="post" data-pagefind-body>
+		<header class="post-head">
+			{post.isDraft && <p data-pagefind-ignore><span class="pill draft">Draft: only visible in local preview</span></p>}
+			<p class="eyebrow" data-pagefind-ignore>
+				{d.service ? <a href={`/services/${slugify(d.service)}/`}>{d.service}</a> : 'Sermon article'}
+			</p>
+			<h1>{d.title}</h1>
+			<p class="dek">{d.description}</p>
+			<p class="byline" data-pagefind-ignore>
+				<time datetime={d.pubDate.toISOString().slice(0, 10)}>Preached {formatDate(d.pubDate)}</time>
+				{d.preacher && <span> · {d.preacher}</span>}
+				<span> · {readingMinutes(post.body)} min read</span>
+			</p>
+			{
+				d.primaryPassage && (
+					<p class="passage" data-pagefind-ignore>
+						Key passage:{' '}
+						<a href={kjvLink(d.primaryPassage)} rel="noopener">
+							{d.primaryPassage}
+						</a>
+					</p>
+				)
+			}
+			{
+				(d.audioUrl || d.videoUrl) && (
+					<div class="media" data-pagefind-ignore>
+						{d.audioUrl && (
+							<figure>
+								<figcaption>Listen to the sermon</figcaption>
+								<audio controls preload="none" src={d.audioUrl}>
+									<a href={d.audioUrl}>Download the audio</a>
+								</audio>
+							</figure>
+						)}
+						{d.videoUrl && (
+							<p>
+								<a class="watch" href={d.videoUrl} rel="noopener">
+									▶ Watch the service
+								</a>
+							</p>
+						)}
+					</div>
+				)
+			}
+		</header>
+
+		<div class="prose">
+			<Content />
+		</div>
+
+		<footer class="post-foot" data-pagefind-ignore>
+			{
+				references.length > 0 && (
+					<section>
+						<h2>Scripture in this article</h2>
+						<ul class="refs">
+							{references.map((ref) => {
+								const book = bookOf(ref);
+								return (
+									<li>
+										<a href={kjvLink(ref)} rel="noopener">
+											{ref}
+										</a>
+										{book && (
+											<a class="more" href={`/scripture/${slugify(book)}/`}>
+												More on {book}
+											</a>
+										)}
+									</li>
+								);
+							})}
+						</ul>
+					</section>
+				)
+			}
+
+			<section class="share">
+				<h2>Share this article</h2>
+				<p>
+					<a href={share.facebook} rel="noopener">Facebook</a>
+					<a href={share.x} rel="noopener">X</a>
+					<a href={share.email}>Email</a>
+					<button type="button" data-copy={url.href}>Copy link</button>
+				</p>
+			</section>
+
+			<nav class="adjacent" aria-label="More articles">
+				{
+					newer ? (
+						<a href={postUrl(newer)}>
+							<span>← Newer</span>
+							{newer.data.title}
+						</a>
+					) : (
+						<span />
+					)
+				}
+				{
+					older && (
+						<a class="older" href={postUrl(older)}>
+							<span>Older →</span>
+							{older.data.title}
+						</a>
+					)
+				}
+			</nav>
+		</footer>
+	</article>
+</Base>
+
+<script>
+	for (const btn of document.querySelectorAll<HTMLButtonElement>('button[data-copy]')) {
+		btn.addEventListener('click', async () => {
+			try {
+				await navigator.clipboard.writeText(btn.dataset.copy ?? location.href);
+				btn.textContent = 'Link copied';
+			} catch {
+				btn.textContent = 'Copy failed';
+			}
+			setTimeout(() => (btn.textContent = 'Copy link'), 2000);
+		});
+	}
+</script>
+
+<style>
+	.post {
+		max-width: var(--measure);
+		margin: 0 auto;
+	}
+
+	.post-head {
+		margin-bottom: 2rem;
+		padding-bottom: 1.5rem;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.eyebrow a {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.eyebrow a:hover {
+		text-decoration: underline;
+	}
+
+	h1 {
+		font-size: clamp(2rem, 5.5vw, 2.8rem);
+		margin: 0 0 0.75rem;
+	}
+
+	.dek {
+		font-family: var(--font-read);
+		font-size: 1.25rem;
+		line-height: 1.5;
+		color: var(--text-dim);
+		margin: 0 0 1rem;
+	}
+
+	.byline,
+	.passage {
+		margin: 0 0 0.3rem;
+		font-size: 0.95rem;
+		color: var(--text-muted);
+	}
+
+	.media {
+		margin-top: 1.25rem;
+		padding: 1rem;
+		background: var(--surface);
+		border: 1px solid var(--border);
+		border-radius: 10px;
+	}
+
+	.media figure {
+		margin: 0;
+	}
+
+	.media figcaption {
+		font-size: 0.85rem;
+		font-weight: 700;
+		margin-bottom: 0.4rem;
+	}
+
+	.media audio {
+		width: 100%;
+	}
+
+	.media p {
+		margin: 0.75rem 0 0;
+	}
+
+	.media figure + p {
+		margin-top: 0.75rem;
+	}
+
+	.media > p:only-child {
+		margin: 0;
+	}
+
+	.watch {
+		font-weight: 700;
+	}
+
+	.post-foot {
+		margin-top: 3rem;
+		padding-top: 1.5rem;
+		border-top: 1px solid var(--border);
+	}
+
+	.post-foot h2 {
+		font-family: var(--font-ui);
+		font-size: 0.85rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--text-muted);
+		margin: 0 0 0.75rem;
+	}
+
+	.post-foot section {
+		margin-bottom: 2rem;
+	}
+
+	.refs {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		columns: 2;
+		column-gap: 2rem;
+	}
+
+	.refs li {
+		break-inside: avoid;
+		margin-bottom: 0.5rem;
+	}
+
+	.refs .more {
+		display: block;
+		font-size: 0.8rem;
+		color: var(--text-muted);
+	}
+
+	.share p {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin: 0;
+	}
+
+	.share a,
+	.share button {
+		font: inherit;
+		font-size: 0.9rem;
+		font-weight: 700;
+		padding: 0.4rem 0.9rem;
+		border: 1px solid var(--border);
+		border-radius: 999px;
+		background: var(--surface);
+		color: var(--text);
+		text-decoration: none;
+		cursor: pointer;
+	}
+
+	.share a:hover,
+	.share button:hover {
+		border-color: var(--link);
+		color: var(--link);
+	}
+
+	.adjacent {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+	}
+
+	.adjacent a {
+		display: block;
+		padding: 0.9rem 1rem;
+		border: 1px solid var(--border);
+		border-radius: 10px;
+		background: var(--surface);
+		text-decoration: none;
+		color: var(--text);
+		font-family: var(--font-read);
+		font-weight: 700;
+		line-height: 1.3;
+	}
+
+	.adjacent a:hover {
+		border-color: var(--link);
+	}
+
+	.adjacent span {
+		display: block;
+		font-family: var(--font-ui);
+		font-weight: 400;
+		font-size: 0.8rem;
+		color: var(--text-muted);
+		margin-bottom: 0.25rem;
+	}
+
+	.adjacent .older {
+		text-align: right;
+		grid-column: 2;
+	}
+
+	@media (max-width: 640px) {
+		.refs {
+			columns: 1;
+		}
+
+		.adjacent {
+			grid-template-columns: 1fr;
+		}
+
+		.adjacent .older {
+			grid-column: 1;
+			text-align: left;
+		}
+	}
+</style>

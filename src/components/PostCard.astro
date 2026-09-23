@@ -1,0 +1,77 @@
+---
+import { formatDate, type Post, postUrl, readingMinutes } from '../lib/posts';
+
+interface Props {
+	post: Post;
+	/** Heading level for the title, so list pages keep a valid outline. */
+	level?: 'h2' | 'h3';
+}
+
+const { post, level = 'h2' } = Astro.props;
+const { title, description, pubDate, service, primaryPassage, preacher } = post.data;
+const Heading = level;
+---
+
+<article class="card">
+	<p class="meta">
+		<time datetime={pubDate.toISOString().slice(0, 10)}>{formatDate(pubDate)}</time>
+		{service && <span> · {service}</span>}
+		{preacher && <span> · {preacher}</span>}
+		<span> · {readingMinutes(post.body)} min read</span>
+	</p>
+	<Heading class="title"><a href={postUrl(post)}>{title}</a></Heading>
+	<p class="desc">{description}</p>
+	<p class="tags">
+		{post.isDraft && <span class="pill draft">Draft</span>}
+		{primaryPassage && <span class="pill">{primaryPassage}</span>}
+	</p>
+</article>
+
+<style>
+	.card {
+		padding: 1.5rem 0;
+		border-bottom: 1px solid var(--border);
+	}
+
+	.card:first-child {
+		padding-top: 0;
+	}
+
+	.meta {
+		margin: 0 0 0.35rem;
+		font-size: 0.88rem;
+		color: var(--text-muted);
+	}
+
+	.title {
+		margin: 0 0 0.5rem;
+		font-size: clamp(1.3rem, 3.2vw, 1.6rem);
+	}
+
+	.title a {
+		color: var(--text);
+		text-decoration: none;
+	}
+
+	.title a:hover {
+		color: var(--link);
+		text-decoration: underline;
+	}
+
+	.desc {
+		margin: 0 0 0.6rem;
+		color: var(--text-dim);
+		max-width: var(--measure);
+	}
+
+	.tags {
+		margin: 0;
+		display: flex;
+		gap: 0.4rem;
+		flex-wrap: wrap;
+	}
+
+	.tags:empty {
+		display: none;
+	}
+</style>

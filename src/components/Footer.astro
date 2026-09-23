@@ -1,0 +1,118 @@
+---
+import { CHURCH } from '../consts';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+	<div class="inner">
+		<div class="verse">
+			<p>“{CHURCH.tagline}”</p>
+			<p class="ref">{CHURCH.taglineRef}</p>
+		</div>
+		<div class="cols">
+			<div>
+				<h2>{CHURCH.name}</h2>
+				<p>{CHURCH.city}, {CHURCH.region} {CHURCH.postalCode}<br />{CHURCH.phone}</p>
+				<p><a href={CHURCH.url}>wbt4god.com</a></p>
+			</div>
+			<div>
+				<h2>Service times</h2>
+				<ul>
+					{CHURCH.services.map((s) => <li><strong>{s.day}:</strong> {s.times}</li>)}
+				</ul>
+			</div>
+			<div>
+				<h2>Follow along</h2>
+				<ul>
+					<li><a href="/rss.xml">RSS feed</a></li>
+					<li><a href="/archive/">All articles</a></li>
+					<li><a href="/scripture/">Articles by book</a></li>
+				</ul>
+			</div>
+		</div>
+		<p class="fine">© {year} {CHURCH.name}. Scripture quotations are from the King James Version.</p>
+	</div>
+</footer>
+
+<style>
+	.site-footer {
+		background: var(--navy-deep);
+		color: #dfe7ee;
+		border-top: 4px solid var(--red);
+		font-size: 0.95rem;
+	}
+
+	.inner {
+		max-width: 64rem;
+		margin: 0 auto;
+		padding: 2.5rem var(--gutter) 2rem;
+	}
+
+	.verse {
+		font-family: var(--font-read);
+		font-style: italic;
+		font-size: 1.15rem;
+		color: var(--cream);
+		max-width: 40rem;
+		margin-bottom: 2rem;
+	}
+
+	.verse p {
+		margin: 0;
+	}
+
+	.verse .ref {
+		font-style: normal;
+		font-size: 0.9rem;
+		margin-top: 0.3rem;
+		opacity: 0.85;
+	}
+
+	.cols {
+		display: grid;
+		grid-template-columns: repeat(3, 1fr);
+		gap: 1.5rem 2rem;
+	}
+
+	h2 {
+		font-family: var(--font-ui);
+		font-size: 0.8rem;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: #fff;
+		margin: 0 0 0.6rem;
+	}
+
+	p {
+		margin: 0 0 0.5rem;
+	}
+
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	li {
+		margin-bottom: 0.3rem;
+	}
+
+	a {
+		color: #fff;
+	}
+
+	.fine {
+		margin-top: 2rem;
+		padding-top: 1.25rem;
+		border-top: 1px solid rgb(255 255 255 / 15%);
+		font-size: 0.82rem;
+		opacity: 0.75;
+	}
+
+	@media (max-width: 760px) {
+		.cols {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

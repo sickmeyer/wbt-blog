@@ -1,0 +1,71 @@
+---
+import type { GetStaticPaths } from 'astro';
+import PostCard from '../../components/PostCard.astro';
+import Base from '../../layouts/Base.astro';
+import { BOOKS, booksOf, getPosts, type Post, slugify } from '../../lib/posts';
+
+export const getStaticPaths = (async () => {
+	const posts = await getPosts();
+	return BOOKS.map((book) => ({
+		params: { book: slugify(book) },
+		props: { book, posts: posts.filter((p) => booksOf(p).includes(book)) },
+	})).filter((p) => p.props.posts.length > 0);
+}) satisfies GetStaticPaths;
+
+interface Props {
+	book: string;
+	posts: Post[];
+}
+const { book, posts } = Astro.props;
+// Articles preaching *from* this book first, then ones that only cite it.
+const primary = posts.filter((p) => p.data.primaryPassage && booksOf(p)[0] === book);
+const citing = posts.filter((p) => !primary.includes(p));
+---
+
+<Base title={`Articles on ${book}`} description={`Sermon articles preaching from or citing the book of ${book}.`}>
+	<header class="page-head">
+		<p class="eyebrow"><a href="/scripture/">Scripture</a></p>
+		<h1>{book}</h1>
+		<p>{posts.length} article{posts.length === 1 ? '' : 's'} preaching from or citing {book}.</p>
+	</header>
+
+	{
+		primary.length > 0 && (
+			<section>
+				<h2>Preached from {book}</h2>
+				{primary.map((post) => (
+					<PostCard post={post} level="h3" />
+				))}
+			</section>
+		)
+	}
+	{
+		citing.length > 0 && (
+			<section>
+				<h2>Also citing {book}</h2>
+				{citing.map((post) => (
+					<PostCard post={post} level="h3" />
+				))}
+			</section>
+		)
+	}
+</Base>
+
+<style>
+	.eyebrow a {
+		color: inherit;
+	}
+
+	section {
+		margin-bottom: 2.5rem;
+	}
+
+	h2 {
+		font-size: 1.1rem;
+		font-family: var(--font-ui);
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+		color: var(--text-muted);
+		margin: 0 0 1rem;
+	}
+</style>

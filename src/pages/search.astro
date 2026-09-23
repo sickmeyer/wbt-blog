@@ -1,0 +1,53 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Search" description="Search every sermon article from Worthington Baptist Temple.">
+	<link slot="head" href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+	<header class="page-head">
+		<p class="eyebrow">Search</p>
+		<h1>Search the Articles</h1>
+		<p>Search by topic, phrase or scripture reference, for example “grace”, “forgiveness” or “Romans 10”.</p>
+	</header>
+
+	<div id="search"></div>
+	<noscript><p>Search needs JavaScript. You can also browse the <a href="/archive/">archive</a>.</p></noscript>
+	{
+		import.meta.env.DEV && (
+			<p class="dev-note">
+				Search is built by Pagefind after <code>npm run build</code>, so it only works in{' '}
+				<code>npm run preview</code> or on the live site, not in <code>npm run dev</code>.
+			</p>
+		)
+	}
+	<script is:inline src="/pagefind/pagefind-ui.js"></script>
+	<script is:inline>
+		window.addEventListener('DOMContentLoaded', () => {
+			if (!window.PagefindUI) return;
+			const params = new URLSearchParams(location.search);
+			const ui = new window.PagefindUI({ element: '#search', showSubResults: true, showImages: false, resetStyles: false });
+			if (params.get('q')) ui.triggerSearch(params.get('q'));
+		});
+	</script>
+</Base>
+
+
+
+<style is:global>
+	#search {
+		--pagefind-ui-scale: 0.95;
+		--pagefind-ui-primary: var(--link);
+		--pagefind-ui-text: var(--text);
+		--pagefind-ui-background: var(--surface);
+		--pagefind-ui-border: var(--border);
+		--pagefind-ui-tag: var(--quote-bg);
+		--pagefind-ui-font: var(--font-ui);
+		max-width: var(--measure);
+	}
+
+	.dev-note {
+		margin-top: 1.5rem;
+		font-size: 0.9rem;
+		color: var(--text-muted);
+	}
+</style>

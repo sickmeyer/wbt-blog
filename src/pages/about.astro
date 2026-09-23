@@ -1,0 +1,52 @@
+---
+import { CHURCH } from '../consts';
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="About" description={`About the sermon articles from ${CHURCH.name} in ${CHURCH.city}, ${CHURCH.region}.`}>
+	<article class="about">
+		<header class="page-head">
+			<p class="eyebrow">About</p>
+			<h1>About These Articles</h1>
+		</header>
+
+		<div class="prose">
+			<p>
+				{CHURCH.name} is a timeless, independent, unaffiliated Baptist church in {CHURCH.city},
+				Minnesota that believes, preaches, and practices the Bible.
+			</p>
+			<p>
+				The articles on this site are adapted from the preaching in our services, so that someone
+				who wasn't in the room can still sit down with the message and be fed by it. Each one is
+				written from that service's sermon, reviewed before it is published, and every quoted
+				verse is checked against the King James Version.
+			</p>
+			<p>
+				Where a recording is available, it's linked at the top of the article so you can listen to
+				the message as it was preached.
+			</p>
+
+			<h2>Visit us</h2>
+			<ul>
+				{CHURCH.services.map((s) => <li><strong>{s.day}:</strong> {s.times}</li>)}
+			</ul>
+			<p>
+				{CHURCH.city}, {CHURCH.region} {CHURCH.postalCode} · {CHURCH.phone}<br />
+				More about the church, what we believe, and how to reach us is at{' '}
+				<a href={CHURCH.url}>wbt4god.com</a>.
+			</p>
+
+			<h2>Follow new articles</h2>
+			<p>
+				Add <a href="/rss.xml">our RSS feed</a> to a feed reader to see each new article as it's
+				published.
+			</p>
+		</div>
+	</article>
+</Base>
+
+<style>
+	.about {
+		max-width: var(--measure);
+	}
+</style>
