@@ -70,10 +70,6 @@ export const SPANISH_BOOKS = [
 	'2 Tesalonicenses', '1 Timoteo', '2 Timoteo', 'Tito', 'Filemón', 'Hebreos', 'Santiago',
 	'1 Pedro', '2 Pedro', '1 Juan', '2 Juan', '3 Juan', 'Judas', 'Apocalipsis',
 ];
-// USFM book codes, aligned with BOOKS (eBible.org page names).
-const USFM = ('GEN EXO LEV NUM DEU JOS JDG RUT 1SA 2SA 1KI 2KI 1CH 2CH EZR NEH EST JOB PSA PRO ECC SNG ISA JER ' +
-	'LAM EZK DAN HOS JOL AMO OBA JON MIC NAM HAB ZEP HAG ZEC MAL MAT MRK LUK JHN ACT ROM 1CO 2CO GAL ' +
-	'EPH PHP COL 1TH 2TH 1TI 2TI TIT PHM HEB JAS 1PE 2PE 1JN 2JN 3JN JUD REV').split(' ');
 const OLD_TESTAMENT_BOOKS = 39;
 
 const fold = (s: string) => s.normalize('NFKD').replace(/\p{M}/gu, '').toLowerCase().trim();
@@ -108,17 +104,15 @@ export function booksOf(post: Post): string[] {
 	return [...new Set(refs.map(bookOf).filter(Boolean) as string[])];
 }
 
-/** Link to the verse text: KJV on BibleGateway, or the RVG chapter on eBible.org. */
+/** Link to the verse text on BibleGateway: KJV, or the Reina-Valera 1960 for Spanish posts. */
 export function verseLink(reference: string, lang: Lang = 'en'): string {
+	let search = reference;
 	if (lang === 'es') {
+		// BibleGateway parses English book names reliably; the chapter/verse part is the same.
 		const book = bookOf(reference);
-		const cv = reference.trim().match(/\s(\d+)(?::(\d+))?/);
-		if (book && cv) {
-			const code = USFM[BOOKS.indexOf(book)];
-			const chapter = String(cv[1]).padStart(code === 'PSA' ? 3 : 2, '0');
-			return `https://ebible.org/sparvg/${code}${chapter}.htm${cv[2] ? `#V${cv[2]}` : ''}`;
-		}
-		return 'https://ebible.org/sparvg/';
+		const tail = reference.trim().match(/\s(\d.*)$/);
+		if (book && tail) search = `${book} ${tail[1]}`;
 	}
-	return `https://www.biblegateway.com/passage/?search=${encodeURIComponent(reference)}&version=KJV`;
+	const version = lang === 'es' ? 'RVR1960' : 'KJV';
+	return `https://www.biblegateway.com/passage/?search=${encodeURIComponent(search)}&version=${version}`;
 }

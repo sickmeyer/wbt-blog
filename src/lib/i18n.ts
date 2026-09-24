@@ -76,7 +76,7 @@ export const T = {
 		locale: 'es-US',
 		siteTitle: 'Artículos de Sermones',
 		homeIntro:
-			'La predicación del servicio en español, puesta por escrito para leerla, compartirla y estudiarla. Cada cita bíblica se verifica con la Reina Valera Gómez.',
+			'La predicación del servicio en español, puesta por escrito para leerla, compartirla y estudiarla. Cada cita bíblica se verifica con la Reina-Valera 1960.',
 		noPosts: 'Todavía no se han publicado artículos. Vuelva a visitarnos después del domingo, o visite',
 		forServiceTimes: 'para los horarios de los servicios.',
 		articles: 'Artículos',
@@ -119,8 +119,8 @@ export const T = {
 		searchTitle: 'Buscar en los Artículos',
 		searchLede: 'Busque por tema, frase o cita bíblica, por ejemplo «gracia», «perdón» o «Romanos 10».',
 		searchNoJs: 'La búsqueda necesita JavaScript. También puede ver el',
-		bibleName: 'Reina Valera Gómez',
-		footerVerse: 'Venid, oíd todos los que teméis a Dios, y contaré lo que Él ha hecho a mi alma.',
+		bibleName: 'Reina-Valera 1960',
+		footerVerse: 'Venid, oíd todos los que teméis a Dios, Y contaré lo que ha hecho a mi alma.',
 		footerVerseRef: 'Salmos 66:16',
 		serviceTimes: 'Horarios',
 		followAlong: 'Siga los artículos',
@@ -128,7 +128,7 @@ export const T = {
 		allArticles: 'Todos los artículos',
 		articlesByBook: 'Artículos por libro',
 		scriptureNotice:
-			'Las citas bíblicas son de la Santa Biblia Reina Valera Gómez, © 2004, 2010, 2023 Dr. Humberto Gómez Caballero. Se permite su reproducción para distribución gratuita.',
+			'Las citas bíblicas han sido tomadas de la Reina-Valera 1960™ © Sociedades Bíblicas en América Latina, 1960. Derechos renovados 1988, Sociedades Bíblicas Unidas. Utilizado con permiso.',
 		skip: 'Ir al contenido',
 		rssTitle: 'Artículos de Sermones | Worthington Baptist Temple',
 		shortTitle: 'Artículos de Sermones WBT',
