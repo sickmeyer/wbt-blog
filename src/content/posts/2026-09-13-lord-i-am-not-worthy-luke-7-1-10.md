@@ -1,5 +1,5 @@
 ---
-title: 'Lord, I Am Not Worthy: The Centurion''s Faith in Luke 7'
+title: 'Lord, I Am Not Worthy: The Centurion''s Faith'
 slug: lord-i-am-not-worthy-luke-7-1-10
 description: Luke 7:1-10 shows a Roman centurion who said, 'Lord, I am not worthy.' Learn how humility builds great faith and how you can approach God the same way.
 pubDate: '2026-09-13'
@@ -39,7 +39,6 @@ tags: []
 audioUrl: https://t.subsplash.com/r/aHR0cHM6Ly9jZG4uc3Vic3BsYXNoLmNvbS9hdWRpb3MvQlFTSlQ3LzhhYmNjODY1LTZhMDMtNDkwNi1hNDMwLTY5ZmJhNjY3YTAzNi9hdWRpby5tcDM.mp3?k=BQSJT7&s=3&sapid=rkdg6r6
 videoUrl: https://www.youtube.com/watch?v=4XWWxR232ec
 sourceId: 4XWWxR232ec
-draft: true
 ---
 
 # Lord, I Am Not Worthy: The Centurion's Faith in Luke 7
