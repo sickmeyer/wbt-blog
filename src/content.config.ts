@@ -21,6 +21,9 @@ const post = z.object({
 	sourceId: z.string().optional(),
 	// 'es' posts are shown under /es/ (Spanish service); English is the default.
 	lang: z.enum(['en', 'es']).default('en'),
+	// EchoPulpit's "Unpublish" sets this to pull a post from the live site
+	// without deleting it; "Republish" clears it. See src/lib/posts.ts.
+	draft: z.boolean().default(false),
 });
 
 // Published posts: committed to the repo and deployed.

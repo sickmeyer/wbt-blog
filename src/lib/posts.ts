@@ -9,7 +9,10 @@ const showDrafts = import.meta.env.DEV || process.env.INCLUDE_DRAFTS === 'true';
 
 /** Published posts in one language, plus drafts when previewing. Newest first. */
 export async function getPosts(lang: Lang = 'en'): Promise<Post[]> {
-	const published = (await getCollection('posts')).map((p) => ({ ...p, isDraft: false }));
+	const published = (await getCollection('posts', ({ data }) => !data.draft)).map((p) => ({
+		...p,
+		isDraft: false,
+	}));
 	const drafts = showDrafts
 		? (await getCollection('drafts')).map((p) => ({ ...p, isDraft: true }))
 		: [];
