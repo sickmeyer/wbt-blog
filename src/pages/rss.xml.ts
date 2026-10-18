@@ -1,12 +1,13 @@
 import rss from '@astrojs/rss';
 import type { APIContext } from 'astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
-import { DC_NAMESPACE, feedHtml, xmlText } from '../lib/feed';
+import { DC_NAMESPACE, feedHtml, feedImage, MEDIA_NAMESPACE, xmlText } from '../lib/feed';
 import { getPosts, postUrl } from '../lib/posts';
 
 // Subsplash imports articles from this feed: `description` stays the short
 // SEO summary, the full article goes in content:encoded, and the preacher is
-// dc:creator (RSS <author> must be an email address). Checked after every
+// dc:creator (RSS <author> must be an email address), and the post's social
+// card is its media:content image. Checked after every
 // build by scripts/check-feed.mjs.
 export async function GET(context: APIContext) {
 	const site = context.site!;
@@ -15,7 +16,7 @@ export async function GET(context: APIContext) {
 		title: SITE_TITLE,
 		description: SITE_DESCRIPTION,
 		site,
-		xmlns: { dc: DC_NAMESPACE },
+		xmlns: { dc: DC_NAMESPACE, media: MEDIA_NAMESPACE },
 		items: await Promise.all(
 			posts.map(async (post) => ({
 				title: post.data.title,
@@ -23,9 +24,9 @@ export async function GET(context: APIContext) {
 				pubDate: post.data.pubDate,
 				link: postUrl(post),
 				content: await feedHtml(post, site),
-				customData: post.data.preacher
-					? `<dc:creator>${xmlText(post.data.preacher)}</dc:creator>`
-					: undefined,
+				customData:
+					(post.data.preacher ? `<dc:creator>${xmlText(post.data.preacher)}</dc:creator>` : '') +
+					feedImage(post, site),
 				categories: [post.data.service, post.data.primaryPassage, ...post.data.tags].filter(
 					Boolean,
 				) as string[],

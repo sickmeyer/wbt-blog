@@ -7,7 +7,7 @@
 // Compares the feed against the Markdown sources so a change that breaks the
 // feed -- invalid XML, a missing namespace, an empty article, a changed GUID,
 // a draft or Spanish post leaking in -- fails CI before it deploys.
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseFrontmatter } from '@astrojs/markdown-remark';
 import { XMLParser, XMLValidator } from 'fast-xml-parser';
@@ -18,6 +18,7 @@ const POSTS = 'src/content/posts';
 const NS = {
 	content: 'http://purl.org/rss/1.0/modules/content/',
 	dc: 'http://purl.org/dc/elements/1.1/',
+	media: 'http://search.yahoo.com/mrss/',
 };
 
 const failures = [];
@@ -90,6 +91,27 @@ for (const item of items) {
 		fail(`${label}: dc:creator is "${item['dc:creator']}", expected "${fm.preacher}"`);
 	}
 
+	// Image: the post's own social card, really built, 1200x630 PNG.
+	const media = item['media:content'];
+	const slug = guid.slice(`${SITE}/posts/`.length, -1);
+	if (media?.['@_url'] !== `${SITE}/og/${slug}.png`) {
+		fail(`${label}: media:content url is "${media?.['@_url']}", expected ${SITE}/og/${slug}.png`);
+	} else if (media['@_medium'] !== 'image' || media['@_type'] !== 'image/png') {
+		fail(`${label}: media:content is not medium="image" type="image/png"`);
+	} else {
+		const png = join('dist', 'og', `${slug}.png`);
+		if (!existsSync(png)) fail(`${label}: ${png} was not built`);
+		else {
+			const buf = readFileSync(png);
+			const [w, h] = [buf.readUInt32BE(16), buf.readUInt32BE(20)];
+			if (buf.toString('latin1', 1, 4) !== 'PNG' || w !== 1200 || h !== 630) {
+				fail(`${label}: ${png} is not a 1200x630 PNG`);
+			} else if (media['@_width'] !== String(w) || media['@_height'] !== String(h)) {
+				fail(`${label}: media:content width/height don't match ${png}`);
+			}
+		}
+	}
+
 	// 4. Full article body, safe and absolute.
 	const html = item['content:encoded'] ?? '';
 	if (html.replace(/<[^>]*>/g, '').trim().length < 200) fail(`${label}: content:encoded is missing or too short`);
@@ -112,4 +134,4 @@ if (failures.length) {
 	console.error(`${FEED}: ${failures.length} problem(s)\n  ${failures.join('\n  ')}`);
 	process.exit(1);
 }
-console.log(`${FEED}: OK -- ${items.length} items, well-formed, namespaces declared, full content, GUIDs = permalinks, no drafts or Spanish posts.`);
+console.log(`${FEED}: OK -- ${items.length} items, well-formed, namespaces declared, full content, images built, GUIDs = permalinks, no drafts or Spanish posts.`);

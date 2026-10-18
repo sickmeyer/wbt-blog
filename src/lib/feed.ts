@@ -30,3 +30,12 @@ export const xmlText = (s: string) =>
 	s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 export const DC_NAMESPACE = 'http://purl.org/dc/elements/1.1/';
+export const MEDIA_NAMESPACE = 'http://search.yahoo.com/mrss/';
+
+/**
+ * The post's social preview card (src/pages/og/[slug].png.ts, built for every
+ * post) as the feed item's image, so Subsplash shows the same picture as a
+ * Facebook or iMessage share.
+ */
+export const feedImage = (post: Post, site: URL) =>
+	`<media:content url="${new URL(`/og/${post.id}.png`, site).href}" medium="image" type="image/png" width="1200" height="630"/>`;
