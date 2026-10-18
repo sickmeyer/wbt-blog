@@ -11,6 +11,7 @@
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "check": "astro check",
+    "check:feed": "node scripts/check-feed.mjs",
     "import": "python scripts/import_echopulpit.py",
     "astro": "astro",
     "publish-draft": "node scripts/publish.mjs",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "fast-xml-parser": "^5.11.1",
     "pagefind": "^1.5.2",
     "typescript": "^6.0.3"
   }
