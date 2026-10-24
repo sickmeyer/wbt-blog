@@ -71,7 +71,12 @@ for (const item of items) {
 
 	// Stable GUIDs: the permalink, unchanged from before content:encoded.
 	if (item.guid?.['@_isPermaLink'] !== 'true') fail(`${label}: guid is not isPermaLink="true"`);
-	if (guid !== item.link) fail(`${label}: guid differs from link`);
+	// The link carries UTM tags for Google Analytics; the guid must stay the clean permalink.
+	const linkUrl = new URL(item.link);
+	const utm = linkUrl.search;
+	linkUrl.search = '';
+	if (guid !== linkUrl.href) fail(`${label}: guid differs from link (ignoring UTM tags)`);
+	if (utm !== '?utm_source=app&utm_medium=rss&utm_campaign=feed') fail(`${label}: link lacks the expected UTM tags`);
 	const source = expected.get(guid);
 	if (!source) {
 		fail(`${label}: not an English published post (draft, Spanish, or unknown)`);

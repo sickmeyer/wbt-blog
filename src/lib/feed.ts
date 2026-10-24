@@ -39,3 +39,18 @@ export const MEDIA_NAMESPACE = 'http://search.yahoo.com/mrss/';
  */
 export const feedImage = (post: Post, site: URL) =>
 	`<media:content url="${new URL(`/og/${post.id}.png`, site).href}" medium="image" type="image/png" width="1200" height="630"/>`;
+
+/**
+ * Feed-only link with UTM tags, so a tap-through from the app shows up in
+ * Google Analytics as source "app" / medium "rss". The item's guid must stay
+ * the clean permalink (see feedGuid), or readers would treat every post as new.
+ */
+export const feedLink = (post: Post, site: URL) => {
+	const url = new URL(postUrl(post), site);
+	url.search = 'utm_source=app&utm_medium=rss&utm_campaign=feed';
+	return url.href;
+};
+
+/** The clean permalink as the item's guid, overriding the one derived from link. */
+export const feedGuid = (post: Post, site: URL) =>
+	`<guid isPermaLink="true">${new URL(postUrl(post), site).href}</guid>`;

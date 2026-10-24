@@ -1,7 +1,7 @@
 import rss from '@astrojs/rss';
 import type { APIContext } from 'astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
-import { DC_NAMESPACE, feedHtml, feedImage, MEDIA_NAMESPACE, xmlText } from '../lib/feed';
+import { DC_NAMESPACE, feedGuid, feedHtml, feedImage, feedLink, MEDIA_NAMESPACE, xmlText } from '../lib/feed';
 import { getPosts, postUrl } from '../lib/posts';
 
 // Subsplash imports articles from this feed: `description` stays the short
@@ -22,11 +22,12 @@ export async function GET(context: APIContext) {
 				title: post.data.title,
 				description: post.data.description,
 				pubDate: post.data.pubDate,
-				link: postUrl(post),
+				link: feedLink(post, site),
 				content: await feedHtml(post, site),
 				customData:
 					(post.data.preacher ? `<dc:creator>${xmlText(post.data.preacher)}</dc:creator>` : '') +
-					feedImage(post, site),
+					feedImage(post, site) +
+					feedGuid(post, site),
 				categories: [post.data.service, post.data.primaryPassage, ...post.data.tags].filter(
 					Boolean,
 				) as string[],
