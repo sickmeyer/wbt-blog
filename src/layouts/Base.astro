@@ -7,6 +7,8 @@ import { t } from '../lib/i18n';
 
 type Props = ComponentProps<typeof BaseHead>;
 const lang = Astro.props.lang ?? 'en';
+// Google Analytics measurement ID comes from the environment, not git.
+const GA_ID = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 ---
 
 <!doctype html>
@@ -14,6 +16,17 @@ const lang = Astro.props.lang ?? 'en';
 	<head>
 		<BaseHead {...Astro.props} lang={lang} />
 		<slot name="head" />
+		{GA_ID && (
+			<>
+				<script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
+				<script is:inline define:vars={{ GA_ID }}>
+					window.dataLayer = window.dataLayer || [];
+					function gtag(){dataLayer.push(arguments);}
+					gtag('js', new Date());
+					gtag('config', GA_ID);
+				</script>
+			</>
+		)}
 	</head>
 	<body>
 		<Header lang={lang} />
