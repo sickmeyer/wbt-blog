@@ -1,7 +1,7 @@
 ---
 title: 'Lord, Save Me: Peter Sinking and the Christ Who Lifts (Matthew 14:22-33)'
 slug: lord-save-me-peter-sinking-matthew-14
-description: Peter cried 'Lord, save me' in Matthew 14:22-33. If you're sinking in sin and hiding it behind a smile, here's how Christ still lifts you out.
+description: Peter cried 'Lord, save me' in Matthew 14:22-33. If you're sinking in sin, here's how Christ still lifts you out.
 pubDate: '2026-10-25'
 preacher: Pastor James Sickmeyer
 service: Sunday Main Worship
